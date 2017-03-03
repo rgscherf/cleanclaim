@@ -1,16 +1,21 @@
 (ns cleanclaim.core
-  (:require [dk.ative.docjure.spreadsheet :as sheet]))
+  (:require [dk.ative.docjure.spreadsheet :refer [load-workbook]]
+            [cleanclaim.read-book :refer [read-sheet]]
+            [cleanclaim.table-templates :refer :all]))
 
-(comment
-  (def sh (sheet/load-workbook "testbook.xlsx"))
+(def claim (load-workbook "template-mdra-claim-form--single-cost.xlsm"))
 
-  (defn rows-of
-    [sheetname]
-    (->> sh
-         (sheet/select-sheet sheetname)
-         sheet/row-seq
-         (map #(->> %
-                    sheet/cell-seq
-                    (map sheet/read-cell)))))
+(defn writable-map
+  [template]
+  {:book-index (:idx template)
+   :items (read-sheet claim template)})
 
-  (rows-of "testsheet-one"))
+(map writable-map
+     [employee-operating
+      employee-capital
+      goods-operating
+      goods-capital
+      equip-operating
+      equip-capital
+      revenue])
+

@@ -1,0 +1,5 @@
+* Read sheet
+  - define config-map for each sheet
+    - define select-columns map for each sheet
+    - define # of rows to drop for each sheet
+* write sheet
