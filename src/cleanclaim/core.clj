@@ -32,14 +32,16 @@
 ;; (done) get a seq of all expenses for each write table
 ;; write expenses to table
 
+
+;; to write to book, all expenses for a sheet need to be in a vec of vecs
+;; with nth 0 representing column A, etc
+;; final signature will look like ["Employee" [all-employee-costs] "Equipment" [all-equipment-costs]] etc.
+
 (comment
-  ;; ordering values for write
   (def ex (read-book claim))
-  ;; iterate through table names
   (expenses-of ex "Employee")
   (let [names (set (map :table-name ex))]
     (map (partial flatten-expenses-of ex) names))
-
-  )
+)
 
 
