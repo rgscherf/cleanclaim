@@ -3,7 +3,7 @@
 ;;; Templates for MDRA claim sheets
 ;;; read-sheet takes a workbook and config template
 ;;; templates contain:
-;;;   :idx - the index of a given sheet,
+;;;   :read-idx - the index of a given sheet,
 ;;;   :sheet-cols - the columns within that sheet to grab,
 ;;;   :drops - # of cols to drop before user information begins,
 ;;;   :nilcheck - a vec of cells to validate against (where a nil value in any will drop the row),
@@ -37,7 +37,7 @@
            :total total*)))
 
 (def employee-operating
-  {:idx 3
+  {:read-idx 3
    :sheet-cols {:C :name
                 :D :etype
                 :E :start
@@ -52,11 +52,14 @@
                 :N :total}
    :drops 12
    :nilcheck [:start :end :name]
+   :table-name "Employee"
+   :expense-class :operating
    :correction employee-correction})
 
 (def employee-capital
   (assoc employee-operating
-         :idx 4
+         :read-idx 4
+         :expense-class :capital
          :drops 13))
 
 ;;;;;;;;;;;;;;;;;;;;;
@@ -80,7 +83,7 @@
            :total total)))
 
 (def goods-operating
-  {:idx 1
+  {:read-idx 1
    :sheet-cols {:C :start
                 :D :end
                 :E :supplier
@@ -92,11 +95,14 @@
                 :K :reference}
    :drops 11
    :nilcheck [:start :end :eligible-excluding]
+   :table-name "Goods and Services"
+   :expense-class :operating
    :correction goods-correction})
 
 (def goods-capital
   (assoc goods-operating
-         :idx 2
+         :read-idx 2
+         :expense-class :capital
          :drops 9))
 
 ;; EQUIPMENT
@@ -111,7 +117,7 @@
            :grand-total total*)))
 
 (def equip-operating
-  {:idx 5
+  {:read-idx 5
    :sheet-cols {:C :start
                 :D :end
                 :E :equipment
@@ -124,16 +130,19 @@
                 :L :grand-total}
    :drops 12
    :nilcheck [:start :end :equipment]
+   :table-name "Equipment"
+   :expense-class :operating
    :correction equip-correction})
 
 (def equip-capital
   (assoc equip-operating
-         :idx 6
+         :read-idx 6
+         :expense-class :capital
          :drops 10))
 
 ;; REVENUE
 (def revenue
-  {:idx 7
+  {:read-idx 7
    :sheet-cols {:B :start
                 :C :end
                 :D :source
@@ -142,12 +151,13 @@
                 :G :reference}
    :drops 07
    :nilcheck [:start :end]
+   :table-name "Revenue"
    :correction identity})
 
 ;; FUTURE
 
 (def future-costs
-  {:idx 9
+  {:read-idx 9
    :sheet-cols {:B :item-type
                 :C :supplier
                 :D :description
@@ -156,4 +166,5 @@
                 :G :total}
    :drops 07
    :nilcheck [:item-type :description]
+   :table-name "Future Costs"
    :correction identity})

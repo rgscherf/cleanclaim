@@ -1,12 +1,13 @@
 (ns cleanclaim.read-book
   (:require [dk.ative.docjure.spreadsheet :as sheet]
+            [cleanclaim.table-templates :refer :all]
             [cleanclaim.wrap-docjure :as wrap]))
 
-(defn sheet-by-index
+(defn- sheet-by-index
   "Retrieve sheet from book by its index in sheet-seq"
-  [book idx]
+  [book read-idx]
   (nth (sheet/sheet-seq book)
-       idx))
+       read-idx))
 
 (defn- passes-nilcheck?
   "Checks that EVERY value tagged by nilcheck-cols contains a value on this row."
@@ -16,41 +17,32 @@
             (map #(this-row %)
                  nilcheck-cols))))
 
-(defn read-sheet
-  "Reads a sheet defined by config map.
-  Config map keys:
-    idx - index of worksheet in book.
-    sheet-cols - map of excel-label to keyword labels. only take these cols.
-    drop-rows - # of rows to drop before user-entered data begins.
-    nil-check-col - if this column is nil, no user data on this row."
-  [book {:keys [idx sheet-cols drops nilcheck correction]}]
-  (->> (sheet-by-index book idx)
-       (wrap/select-columns* sheet-cols)
-       (drop drops)
-       (filter #(passes-nilcheck? nilcheck %))
-       (map correction)))
+(defn- read-sheet
+  "Reads a sheet defined by config map. See namespace cleanclaim.table-templates"
+  [book {:keys [read-idx sheet-cols drops nilcheck correction expense-class]}]
+  (->> (sheet-by-index book read-idx)
+       (wrap/select-columns* sheet-cols) ;; select correct cols
+       (drop drops) ;; drop required # of rows for this sheet
+       (filter #(passes-nilcheck? nilcheck %)) ;; ensure only valid rows
+       (map correction) ;; fill in formula values
+       (map #(assoc % :expense-class expense-class)) ;; add :operating/:capital
+       ))
 
-(comment
-  (defn readable-rows
-    "Given rows in sheet-seq, return a seq of cells in that row."
-    [rows]
-    (map #(->> %
-               sheet/cell-seq
-               (map sheet/read-cell))
-         rows))
+(def iterable-config-sheets
+  [employee-operating
+   employee-capital
+   goods-operating
+   goods-capital
+   equip-operating
+   equip-capital
+   revenue])
 
-  (defn rows-from-sheet
-    "Return a seq (representing rows) of cell-seqs (each representing cells in the parent row) from a sheet object. Preserves nil values."
-    [worksheet]
-    (->> worksheet
-         sheet/row-seq
-         readable-rows))
+(defn- writable-map
+  [claim template]
+  {:table-name (:table-name template)
+   :items (read-sheet claim template)})
 
-  (defn rows-from-sheetname
-    "Return a seq (representing rows) of cell-seqs (each representing cells in the parent row) from a sheet NAME in given workbook. Preserves nil values."
-    [book sheetname]
-    (->> book
-         (sheet/select-sheet sheetname)
-         sheet/row-seq
-         readable-rows)))
-
+(defn read-book
+  [claim]
+  (map (partial writable-map claim)
+       iterable-config-sheets))
