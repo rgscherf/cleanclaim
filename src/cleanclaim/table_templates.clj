@@ -103,7 +103,9 @@
 
 (defn- equip-correction
   [{:keys [hours rate] :as equip}]
-  (if-let [total* (* hours rate 0.4)]
+  (if-let [total* (* (or hours 0.0)
+                     (or rate 0.0)
+                     0.4)]
     (assoc equip
            :total total*
            :grand-total total*)))

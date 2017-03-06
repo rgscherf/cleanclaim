@@ -10,6 +10,9 @@
   {:book-index (:idx template)
    :items (read-sheet claim template)})
 
+(comment
+  (writable-map revenue))
+
 (map writable-map
      [employee-operating
       employee-capital
