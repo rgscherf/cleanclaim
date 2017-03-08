@@ -1,22 +1,68 @@
-(ns cleanclaim.table-templates)
+(ns cleanclaim.table-config)
 
-;;; Templates for MDRA claim sheets
-;;; read-sheet takes a workbook and config template
-;;; templates contain:
-;;;   :read-idx - the index of a given sheet,
-;;;   :sheet-cols - the columns within that sheet to grab,
-;;;   :drops - # of cols to drop before user information begins,
+;;;; Templates for MDRA claim sheets
+
+;;; Read-sheet takes a workbook and config template.
+;;; Templates contain information about how to read a table,
+;;; fields that must not be nil so that a row will be validated,
+;;; and a function that fills in calculated fields because docjure
+;;;   can't read fomulas. (This fn might just be identity).
+
+;;; fields for reading a table:
+;;;   :read-idx - the index of a given sheet in the source book
+;;;   :sheet-cols - the columns within that sheet to grab
+;;;   :drops - # of cols to drop before user information begins
 ;;;   :nilcheck - a vec of cells to validate against (where a nil value in any will drop the row),
-;;;   :correction - and a function with which to construct missing data.
-
-;;; NOTE: DOCJURE CANNOT READ TABLE FORMULAS. Instead, we drop erroring values.
-;;; Read-sheet always runs the config map's correction fn to re-add these cols.
 
 
 (defn- sum-nillable
   "Sum a series of values that may be nil."
   [& args]
   (apply + (remove nil? args)))
+
+
+;;;;;;;;;;;;;;;;;;;;;
+;; GOODS AND SERVICES
+;;;;;;;;;;;;;;;;;;;;;
+
+(defn- goods-correction
+  "Correction for goods/services operating table because we can't parse forumlas!
+  Adjusts unrecoverable HST and Total fields"
+  [{:keys [unrecoverable-manual eligible-excluding] :as gso}]
+  (let [;; row will contain unrecoverable OR unrecoverable manual
+        unrecoverable (if unrecoverable-manual
+                        nil
+                        (* 0.0176 eligible-excluding))
+        ;; filter nil before summing subtotal + unrecoverable + manual
+        total (sum-nillable eligible-excluding
+                            unrecoverable
+                            unrecoverable-manual)]
+    (assoc gso
+           :unrecoverable unrecoverable
+           :total total)))
+
+(def goods-operating
+  {:read-idx 1
+   :sheet-cols {:C :start
+                :D :end
+                :E :supplier
+                :F :description
+                :G :eligible-excluding
+                :H :unrecoverable
+                :I :unrecoverable-manual
+                :J :total
+                :K :reference}
+   :drops 11
+   :nilcheck [:start :end :eligible-excluding]
+   :table-name "Goods and Services"
+   :expense-class :operating
+   :correction goods-correction})
+
+(def goods-capital
+  (assoc goods-operating
+         :read-idx 2
+         :expense-class :capital
+         :drops 9))
 
 ;;;;;;;;;;;
 ;; EMPLOYEE
@@ -62,50 +108,10 @@
          :expense-class :capital
          :drops 13))
 
-;;;;;;;;;;;;;;;;;;;;;
-;; GOODS AND SERVICES
-;;;;;;;;;;;;;;;;;;;;;
 
-(defn- goods-correction
-  "Correction for goods/services operating table because we can't parse forumlas!
-  Adjusts unrecoverable HST and Total fields"
-  [{:keys [unrecoverable-manual eligible-excluding] :as gso}]
-  (let [;; row will contain unrecoverable OR unrecoverable manual
-        unrecoverable (if unrecoverable-manual
-                        nil
-                        (* 0.0176 eligible-excluding))
-        ;; filter nil before summing subtotal + unrecoverable + manual
-        total (sum-nillable eligible-excluding
-                            unrecoverable
-                            unrecoverable-manual)]
-    (assoc gso
-           :unrecoverable unrecoverable
-           :total total)))
-
-(def goods-operating
-  {:read-idx 1
-   :sheet-cols {:C :start
-                :D :end
-                :E :supplier
-                :F :description
-                :G :eligible-excluding
-                :H :unrecoverable
-                :I :unrecoverable-manual
-                :J :total
-                :K :reference}
-   :drops 11
-   :nilcheck [:start :end :eligible-excluding]
-   :table-name "Goods and Services"
-   :expense-class :operating
-   :correction goods-correction})
-
-(def goods-capital
-  (assoc goods-operating
-         :read-idx 2
-         :expense-class :capital
-         :drops 9))
-
+;;;;;;;;;;;;
 ;; EQUIPMENT
+;;;;;;;;;;;;
 
 (defn- equip-correction
   [{:keys [hours rate] :as equip}]
@@ -140,7 +146,11 @@
          :expense-class :capital
          :drops 10))
 
+
+;;;;;;;;;;
 ;; REVENUE
+;;;;;;;;;;
+
 (def revenue
   {:read-idx 7
    :sheet-cols {:B :start
@@ -154,7 +164,10 @@
    :table-name "Revenue"
    :correction identity})
 
+
+;;;;;;;;;;
 ;; FUTURE
+;;;;;;;;;;
 
 (def future-costs
   {:read-idx 9
@@ -168,3 +181,15 @@
    :nilcheck [:item-type :description]
    :table-name "Future Costs"
    :correction identity})
+
+
+;; Collection of all config maps
+;; to be mapped through with read-book/read-book.
+(def config-coll
+  [employee-operating
+   employee-capital
+   goods-operating
+   goods-capital
+   equip-operating
+   equip-capital
+   revenue])

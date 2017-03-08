@@ -1,6 +1,6 @@
 (ns cleanclaim.read-book
   (:require [dk.ative.docjure.spreadsheet :as sheet]
-            [cleanclaim.table-templates :refer :all]
+            [cleanclaim.table-config :as config]
             [cleanclaim.wrap-docjure :as wrap]))
 
 (defn- sheet-by-index
@@ -28,21 +28,22 @@
        (map #(assoc % :expense-class expense-class)) ;; add :operating/:capital
        ))
 
-(def iterable-config-sheets
-  [employee-operating
-   employee-capital
-   goods-operating
-   goods-capital
-   equip-operating
-   equip-capital
-   revenue])
 
 (defn- writable-map
-  [claim template]
-  {:table-name (:table-name template)
-   :items (read-sheet claim template)})
+  "Process a config sheet, concatting the result to the read-book table result
+  for this expense type (if it's aready been observed)"
+  [claim acc-map {:keys [table-name] :as config-sheet}]
+  (assoc acc-map
+         table-name
+         (concat (get acc-map table-name)
+                 (read-sheet claim config-sheet))))
 
 (defn read-book
+  "Process a claim using config maps defined in cleanclaim.config-maps.
+  Returns a map string-table-names to seqs-of-items-of-expense-type,
+  with operating and capital merged under the same table names."
   [claim]
-  (map (partial writable-map claim)
-       iterable-config-sheets))
+  (reduce (partial writable-map claim)
+          {}
+          config/config-coll))
+
