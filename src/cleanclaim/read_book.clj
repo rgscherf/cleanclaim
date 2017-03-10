@@ -1,6 +1,6 @@
 (ns cleanclaim.read-book
   (:require [dk.ative.docjure.spreadsheet :as sheet]
-            [cleanclaim.table-config :as config]
+            [cleanclaim.read-configs :as config]
             [cleanclaim.wrap-docjure :as wrap]))
 
 (defn- sheet-by-index
@@ -39,7 +39,7 @@
                  (read-sheet claim config-sheet))))
 
 (defn read-book
-  "Process a claim using config maps defined in cleanclaim.config-maps.
+  "Process a claim using config maps defined in cleanclaim.read-configs.
   Returns a map string-table-names to seqs-of-items-of-expense-type,
   with operating and capital merged under the same table names."
   [claim]

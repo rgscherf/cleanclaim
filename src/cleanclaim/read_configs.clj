@@ -1,4 +1,4 @@
-(ns cleanclaim.table-config)
+(ns cleanclaim.read-configs)
 
 ;;;; Templates for MDRA claim sheets
 
@@ -171,7 +171,7 @@
 
 (def future-costs
   {:read-idx 9
-   :sheet-cols {:B :item-type
+   :sheet-cols {:B :expense-class
                 :C :supplier
                 :D :description
                 :E :documentation
