@@ -18,16 +18,14 @@
                  nilcheck-cols))))
 
 (defn- read-sheet
-  "Reads a sheet defined by config map. See namespace cleanclaim.table-templates"
+  "Reads a sheet defined by config map. See namespace cleanclaim.read-configs"
   [book {:keys [read-idx sheet-cols drops nilcheck correction expense-class]}]
   (->> (sheet-by-index book read-idx)
        (wrap/select-columns* sheet-cols) ;; select correct cols
        (drop drops) ;; drop required # of rows for this sheet
        (filter #(passes-nilcheck? nilcheck %)) ;; ensure only valid rows
        (map correction) ;; fill in formula values
-       (map #(assoc % :expense-class expense-class)) ;; add :operating/:capital
-       ))
-
+       (map #(assoc % :expense-class expense-class)))) ;; add :operating/:capital
 
 (defn- writable-map
   "Process a config sheet, concatting the result to the read-book table result
@@ -46,4 +44,3 @@
   (reduce (partial writable-map claim)
           {}
           config/config-coll))
-

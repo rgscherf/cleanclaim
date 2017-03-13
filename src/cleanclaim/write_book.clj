@@ -28,7 +28,6 @@
             (vec (map (partial extract-row claimant-id)
                       rows))))]))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PIPELINE FOR WRITING SHEETS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -41,7 +40,13 @@
           seq-of-pairs))
 
 (def write-tables
-  ["Employee" "Goods and Services"])
+  ["Goods and Services" "Employee" "Equipment" "Revenue" "Future Costs"])
+
+(defn make-workbook
+  [write-data]
+  (->> write-data
+       (apply sheet/create-workbook)
+       (sheet/save-workbook! "testme.xlsx")))
 
 (defn write-book
   "Given an input book mapping table names to expenses,
@@ -51,8 +56,7 @@
   (->> write-tables
        (map (partial write-sheet claimant-id input-book config/write-config))
        unpack-pairs
-       ;; (apply save-workbook! /etc../)
-       ))
+       make-workbook))
 
 (comment
   (def claim (load-workbook "template-mdra-claim-form--single-cost.xlsm"))

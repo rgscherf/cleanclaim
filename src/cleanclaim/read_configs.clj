@@ -177,8 +177,8 @@
                 :E :documentation
                 :F :reference
                 :G :total}
-   :drops 07
-   :nilcheck [:item-type :description]
+   :drops 7
+   :nilcheck [:expense-class :description]
    :table-name "Future Costs"
    :correction identity})
 
@@ -192,4 +192,5 @@
    goods-capital
    equip-operating
    equip-capital
-   revenue])
+   revenue
+   future-costs])

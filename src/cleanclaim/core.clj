@@ -7,7 +7,7 @@
 (def claim (load-workbook "template-mdra-claim-form--single-cost.xlsm"))
 
 (comment
-  (def x (read-book claim))
+  (def x (writeb/write-book 10 (read-book claim)))
   (-> claim
       (readb/read-book)
       #(writeb/write-book 10 %))
