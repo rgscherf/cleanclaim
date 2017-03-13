@@ -60,4 +60,5 @@
 
 (comment
   (def claim (load-workbook "template-mdra-claim-form--single-cost.xlsm"))
+  ((readbook/read-book claim) "Future Costs")
   (write-book 10 (readbook/read-book claim)))

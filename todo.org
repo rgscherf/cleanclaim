@@ -1,5 +1,16 @@
-* Read sheet
-  - define config-map for each sheet
-    - define select-columns map for each sheet
-    - define # of rows to drop for each sheet
-* write sheet
+TODOS for MDRA Cleanclaim
+
+* TODO Read/write admin sheet
+** TODO read admin sheet
+** TODO write admin sheet
+* TODO Validating file
+** TODO map thru read-items to total values per sheet
+** TODO map thru write-items to total values per sheet
+** TODO can I read totals from the source sheet?
+** TODO present all of these in the output book
+* TODO UI
+** TODO basic UI layout
+** TODO claimID field
+** TODO file pickers
+** TODO error reporting in UI? Or just sheet?
+** TODO exec cleanclaim from Access?
