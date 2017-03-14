@@ -91,9 +91,11 @@
   (where a constant # of defined cells are read to the write table)."
   [claim]
   (let [claim-without-admin
+        ;; assoc-reduce to build up a map of (lists of) expense classes
         (reduce (partial writable-map claim)
                 {}
                 config/config-coll)]
+    ;; the admin info sheet isn't a seq of expenses, so we assoc individually.
     (assoc claim-without-admin
            "Admin Info"
            (read-admin-page claim config/admin-config))))
