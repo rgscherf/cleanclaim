@@ -3,6 +3,11 @@
             [cleanclaim.read-configs :as config]
             [cleanclaim.wrap-docjure :as wrap]))
 
+
+;;;;;;;;;;;;;;;;;;;
+;; UTILITY FUNCTIONS
+;;;;;;;;;;;;;;;;;;;
+
 (defn- sheet-by-index
   "Retrieve sheet from book by its index in sheet-seq"
   [book read-idx]
@@ -16,6 +21,18 @@
     (every? identity
             (map #(this-row %)
                  nilcheck-cols))))
+
+(defn read-cell-at
+  "Read the value of a cell on table-sheet."
+  [table-sheet location]
+  (sheet/read-cell
+   (sheet/select-cell location
+                      table-sheet)))
+
+
+;;;;;;;;;;;;;;;;;;
+;; GENERIC READING
+;;;;;;;;;;;;;;;;;;
 
 (defn- read-sheet
   "Reads a sheet defined by config map. See namespace cleanclaim.read-configs"
@@ -36,11 +53,47 @@
          (concat (get acc-map table-name)
                  (read-sheet claim config-sheet))))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; SPECIAL READING FOR ADMIN PAGE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn- stringify-field
+  "A maybe-needed function for converting a field to string type.
+  May be needed for phone numbers."
+  [field m]
+  (assoc m field (str (field m))))
+
+(defn- read-admin-page
+  "Replace each entry in admin-config with the value it points to.
+  Ex {:second-email A4} -> {:second-email jsmith@gmail.com}"
+  [source-claim admin-conf]
+  (let [admin-sheet (sheet-by-index source-claim 0)]
+    (->> admin-conf
+         keys
+         (map (fn associate-admin-value [field]
+                {field (read-cell-at admin-sheet
+                                     (field admin-conf))}))
+         (apply merge)
+         #_(stringify-field :treas-phone)
+         #_(stringify-field :second-phone))))
+
+
+;;;;;;;;;;;;;
+;; PUBLIC API
+;;;;;;;;;;;;;
+
 (defn read-book
   "Process a claim using config maps defined in cleanclaim.read-configs.
   Returns a map string-table-names to seqs-of-items-of-expense-type,
-  with operating and capital merged under the same table names."
+  with operating and capital merged under the same table names.
+  After reducing through the generic tables, assoc data from admin info
+  (where a constant # of defined cells are read to the write table)."
   [claim]
-  (reduce (partial writable-map claim)
-          {}
-          config/config-coll))
+  (let [claim-without-admin
+        (reduce (partial writable-map claim)
+                {}
+                config/config-coll)]
+    (assoc claim-without-admin
+           "Admin Info"
+           (read-admin-page claim config/admin-config))))

@@ -22,6 +22,27 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;
+;; ADMIN/CONTACT INFO
+;;;;;;;;;;;;;;;;;;;;;
+;; Locations of relevant fields for the admin-info table.
+;; Admin table is not called in the same way as other tables.
+;; See ns read-book.
+(def admin-config
+  {:claimant "F4"
+   :event-type "F7"
+   :treas-name "F10"
+   :treas-email "F13"
+   :treas-phone "F16"
+   :second-name "F19"
+   :second-title "F22"
+   :second-email "F25"
+   :second-phone "F28"
+   :street "AA5"
+   :city "AA7"
+   :postal "AA9"
+   :submitted "AA11"})
+
+;;;;;;;;;;;;;;;;;;;;;
 ;; GOODS AND SERVICES
 ;;;;;;;;;;;;;;;;;;;;;
 
