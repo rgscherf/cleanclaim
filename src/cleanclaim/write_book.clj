@@ -49,10 +49,18 @@
   ["Admin Info" "Goods and Services" "Employee" "Equipment" "Revenue" "Future Costs"])
 
 (defn- workbook-name
-  "Make the name of the workbook using the municipality's name."
+  "Make the name of the workbook using the municipality's name.
+  If the name cannot be found, the current date is used."
   [input-book]
-  (str (get-in input-book ["Admin Info" :claimant])
-       "-cleanclaim.xlsx"))
+  (str "cleanclaim - "
+       (if-let [municipality-name (get-in input-book ["Admin Info" :claimant])]
+         municipality-name
+         (java.util.Date.))
+       ".xlsx"))
+
+(comment
+  (workbook-name {"Admin Info" {:laimant "Gold Coast"}})
+  (workbook-name {"Admin Info" {:claimant "Gold Coast"}}))
 
 (defn- write-book-to-disk
   "Write workbook to disk after it is processed by write-book."
