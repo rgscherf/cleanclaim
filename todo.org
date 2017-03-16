@@ -1,15 +1,16 @@
 TODOS for MDRA Cleanclaim
 
-* Read/write admin sheet
-** TODO write admin sheet
-* Validating file
-** TODO map thru read-items to total values per sheet
-** TODO map thru write-items to total values per sheet
-** TODO can I read totals from the source sheet?
-** TODO present all of these in the output book
+* Read/write 
+** write admin sheet
+** Validating claim read/write
+*** map thru read-items to total values per sheet
+*** map thru write-items to total values per sheet
+*** can I read totals from the source sheet?
+*** present all of these in the output book
+** present read/write errors in summary sheet?
 * UI
-** TODO basic UI layout
-** TODO claimID field
-** TODO file pickers
-** TODO error reporting in UI? Or just sheet?
-** TODO exec cleanclaim from Access?
+** basic UI layout
+** pass claimID field to core
+** file pickers
+** error reporting in UI? Or just sheet?
+** exec cleanclaim from Access?
