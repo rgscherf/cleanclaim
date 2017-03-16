@@ -58,10 +58,6 @@
          (java.util.Date.))
        ".xlsx"))
 
-(comment
-  (workbook-name {"Admin Info" {:laimant "Gold Coast"}})
-  (workbook-name {"Admin Info" {:claimant "Gold Coast"}}))
-
 (defn- write-book-to-disk
   "Write workbook to disk after it is processed by write-book."
   [book-name write-data]
