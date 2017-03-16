@@ -1,7 +1,6 @@
 TODOS for MDRA Cleanclaim
 
 * Read/write admin sheet
-** TODO read admin sheet
 ** TODO write admin sheet
 * Validating file
 ** TODO map thru read-items to total values per sheet
