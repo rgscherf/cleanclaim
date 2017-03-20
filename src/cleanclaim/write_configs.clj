@@ -73,11 +73,7 @@
 
     :read-table-total
     (fn [cost-list]
-      (sum-read-sheet cost-list :total))
-
-    :write-table-total
-    (fn [cost-vec]
-      (sum-write-sheet cost-vec 14))
+      [(count cost-list) (sum-read-sheet cost-list :total)])
 
     :extract-row
     (fn [claimant-id
@@ -94,11 +90,7 @@
 
     :read-table-total
     (fn [cost-list]
-      (sum-read-sheet cost-list :total))
-
-    :write-table-total
-    (fn [cost-vec]
-      (sum-write-sheet cost-vec 11))
+      [(count cost-list ) (sum-read-sheet cost-list :total)])
 
     :extract-row
     (fn [claimant-id
@@ -115,11 +107,7 @@
 
     :read-table-total
     (fn [cost-list]
-      (sum-read-sheet cost-list :grand-total))
-
-    :write-table-total
-    (fn [cost-vec]
-      (sum-write-sheet cost-vec 13))
+      [(count cost-list) (sum-read-sheet cost-list :grand-total)])
 
     :extract-row
     (fn [claimant-id
@@ -136,11 +124,7 @@
 
     :read-table-total
     (fn [cost-list]
-      (sum-read-sheet cost-list :income))
-
-    :write-table-total
-    (fn [cost-vec]
-      (sum-write-sheet cost-vec 6))
+      [(count cost-list) (sum-read-sheet cost-list :income)])
 
     :extract-row
     (fn [claimant-id
@@ -158,12 +142,8 @@
 
     :read-table-total
     (fn [cost-list]
-      (sum-read-sheet cost-list :total))
+      [(count cost-list) (sum-read-sheet cost-list :total)])
 
-    :write-table-total
-    (fn [cost-vec]
-      (sum-write-sheet cost-vec 7))
-    
     :extract-row
     (fn [claimant-id
          {:keys [supplier description documentation reference total] }]

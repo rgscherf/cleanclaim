@@ -1,7 +1,8 @@
 (ns cleanclaim.write-book
   (:require [cleanclaim.read-book :as readbook]
             [cleanclaim.write-configs :as config]
-            [dk.ative.docjure.spreadsheet :as sheet :refer [load-workbook]]))
+            [dk.ative.docjure.spreadsheet :as sheet :refer [load-workbook]]
+            [cleanclaim.read-book :as readb]))
 
 ;;; TODO for write-config-maps
 ;;; what are the int values of :operating/:capital?
@@ -37,24 +38,25 @@
      (vector header-row
              (extract-row claimant-id admin-sheet))]))
 
-(defn- costs-in-read-sheet
-  "Total the costs in the read-book for a given sheet."
+(defn- summarize-read-sheet
+  "For a single expense category, retrieve # of items read and their total value."
   [input-book write-configs sheet-name]
-  (let [expenses-for-this-sheet
-        (get input-book sheet-name)
-        total-fn-for-sheet
-        (get-in write-configs [sheet-name :read-table-total])]
-    (total-fn-for-sheet expenses-for-this-sheet)))
+  (let [expenses-for-this-sheet (get input-book sheet-name)
+        total-fn-for-sheet (get-in write-configs [sheet-name :read-table-total])
+        [count-of-items total-for-items] (total-fn-for-sheet expenses-for-this-sheet)]
+    [sheet-name
+     count-of-items
+     total-for-items]))
 
 (defmethod write-sheet "Expenses Summary"
   [claimant-id input-book write-configs expense-sheet-name]
   [expense-sheet-name
    (into []
-         (map (fn [sheet-name]
-                [(str "Expenses read for sheet " sheet-name)
-                 (costs-in-read-sheet input-book write-configs sheet-name)])
-              (remove #(= % "Admin Info")
-                      (keys input-book))))])
+         (cons ["Expense type" "Number of items read" "Total of items read"]
+               (map
+                (partial summarize-read-sheet input-book write-configs)
+                (remove #(= % "Admin Info")
+                        (keys input-book)))))])
 
 (defmethod write-sheet :default
   [claimant-id input-book write-config table-key]
