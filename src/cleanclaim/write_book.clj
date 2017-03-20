@@ -64,10 +64,9 @@
         {:keys [header-row table-total-fn extract-row]} (get write-config table-key)]
     [table-key
      (into []
-           (cons
-            header-row
-            (vec (map (partial extract-row claimant-id)
-                      rows))))]))
+           (cons header-row
+                 (vec (map (partial extract-row claimant-id)
+                           rows))))]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PIPELINE FOR WRITING SHEETS
