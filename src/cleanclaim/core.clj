@@ -9,4 +9,4 @@
 (comment
   (->> claim
       readb/read-book
-      (writeb/write-book 10 ))
+      (writeb/write-book 10)))

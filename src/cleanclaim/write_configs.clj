@@ -48,11 +48,26 @@
 
 (def write-config
 
+  ;;;;;;;;
+  ;; ADMIN
+  ;;;;;;;;
+
+  {"Admin Info"
+   {:header-row
+    ["ClaimantID" "Claimant" "ThreePercentOPT" "EventType" "TreasurerName" "TreasurerEmail" "TreasurerPhone" "SecondaryName" "SecondaryTitle" "SecondaryEmail" "SecondaryPhone" "MailingAddress" "MailingMunicipality" "MailingPostal" "DateSubmitted"]
+    :read-table-total
+    (constantly 0)
+    :write-table-total
+    (constantly 0)
+    :extract-row
+    (fn [claimant-id {:keys [claimant event-type treas-name treas-email treas-phone second-name second-title second-email second-phone street city postal submitted]}]
+      [claimant-id claimant 0 event-type treas-name treas-email treas-phone second-name second-title second-email second-phone street city postal submitted])}
+
   ;;;;;;;;;;;
   ;; EMPLOYEE
   ;;;;;;;;;;;
 
-  {"Employee"
+  "Employee"
    {:header-row
     ["State" "ClaimantID" "ExpenseType" "EmployeeName" "WorkStart" "WorkEnd" "Function" "OTHours" "OverTimeWage" "TotalWageR" "TotalWageTE" "Benefits" "Reference" "ReportedTotal" "AdjustedTotal" "WageType"]
 

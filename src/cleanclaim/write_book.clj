@@ -7,11 +7,6 @@
 ;;; what are the int values of :operating/:capital?
 ;;; what is the default int value for under-review items?
 
-;; TODO for writing
-;; - Write admin-info
-;; - Write summary sheet to ensure we got all read/write expenses.
-
-
 ;;;;;;;;;;;;;;;;;
 ;; WRITING SHEETS
 ;;;;;;;;;;;;;;;;;
@@ -21,14 +16,45 @@
 ;; :extract-table-row -- fn for row-map->row-vec
 ;; :table-total-fn -- fn for summing grand total of all entries in table
 
-;; NOTE write-sheet is a multimethod because writing to the "Admin Info" sheet
-;; is different from iterating through expense items.
+(defmulti write-sheet
+  "Take data for a certain expense type produced by reading an input claim form,
+  a config map for writing expense types,
+  a key identifying the expense type,
+  to produce information to be written to a workbook.
+  For each expense type, writable information has the form
+  [table-name-as-str [expense-type-header-row-vec & expense-row-vecs]].
 
-(defmulti write-sheet (fn [_ _ _ table] table))
+  Writable information for each expense is reduced by (apply conj) into a seq
+  and passed to save-workbook, to save to disk."
+  (fn [_ _ _ table] table))
 
 (defmethod write-sheet "Admin Info"
-  [& _]
-  ["Admin Info" [["Hello" "World"]]])
+  ;; Note that there is no iterating for admin info. It's one row per claim.
+  [claimant-id input-book write-config admin-info-sheet-name]
+  (let [{:keys [extract-row header-row]} (get write-config admin-info-sheet-name)
+        admin-sheet (get input-book admin-info-sheet-name)]
+    [admin-info-sheet-name
+     (vector header-row
+             (extract-row claimant-id admin-sheet))]))
+
+(defn- costs-in-read-sheet
+  "Total the costs in the read-book for a given sheet."
+  [input-book write-configs sheet-name]
+  (let [expenses-for-this-sheet
+        (get input-book sheet-name)
+        total-fn-for-sheet
+        (get-in write-configs [sheet-name :read-table-total])]
+    (total-fn-for-sheet expenses-for-this-sheet)))
+
+(defmethod write-sheet "Expenses Summary"
+  [claimant-id input-book write-configs expense-sheet-name]
+  [expense-sheet-name
+   (into []
+         (map (fn [sheet-name]
+                [(str "Expenses read for sheet " sheet-name)
+                 (costs-in-read-sheet input-book write-configs sheet-name)])
+              (remove #(= % "Admin Info")
+                      (keys input-book))))])
 
 (defmethod write-sheet :default
   [claimant-id input-book write-config table-key]
@@ -46,7 +72,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def write-tables
-  ["Admin Info" "Goods and Services" "Employee" "Equipment" "Revenue" "Future Costs"])
+  ["Expenses Summary" "Admin Info" "Goods and Services" "Employee" "Equipment" "Revenue" "Future Costs"])
 
 (defn- workbook-name
   "Make the name of the workbook using the municipality's name.
