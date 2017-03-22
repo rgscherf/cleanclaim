@@ -111,8 +111,8 @@
   "Given an input book mapping table names to expenses,
   write a book where rows have been organized into vectors.
   Tab ordering is given by order of write-tables."
-  [claimant-id input-book]
-  (write-book-to-disk (workbook-name input-book)
+  [claimant-id output-path input-book]
+  (write-book-to-disk (str output-path ".xlsx") #_(workbook-name output-path)
                       (build-book-as-vecs claimant-id
                                           input-book
                                           write-tables)))

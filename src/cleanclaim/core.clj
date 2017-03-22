@@ -1,12 +1,6 @@
 (ns cleanclaim.core
-  (:require [dk.ative.docjure.spreadsheet :as sheet :refer [load-workbook]]
-            [cleanclaim.read-book :as readb]
-            [cleanclaim.write-book :as writeb]
-            ))
+  (:require [cleanclaim.ui :as ui]))
 
-(def claim (load-workbook "template-mdra-claim-form--single-cost.xlsm"))
+(defn main
+  (ui/render-ui))
 
-(comment
-  (->> claim
-      readb/read-book
-      (writeb/write-book 10)))

@@ -89,8 +89,9 @@
   with operating and capital merged under the same table names.
   After reducing through the generic tables, assoc data from admin info
   (where a constant # of defined cells are read to the write table)."
-  [claim]
-  (let [claim-without-admin
+  [input-path]
+  (let [claim (sheet/load-workbook input-path)
+        claim-without-admin
         ;; assoc-reduce to build up a map of (lists of) expense classes
         (reduce (partial writable-map claim)
                 {}
