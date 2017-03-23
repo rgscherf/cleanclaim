@@ -108,8 +108,8 @@
   (-> (s/frame :title "Cleanclaim 1.0"
                :content container
                :resizable? false
-               :size [700 :by 400])
-               ;:on-close :exit)
+               :size [700 :by 400]
+               :on-close :exit)
       s/show!))
 
 (def render-ui (show-frame))
