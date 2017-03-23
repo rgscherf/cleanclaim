@@ -28,7 +28,7 @@ A [seesaw](https://github.com/daveray/seesaw)-based UI namespace, `cleanclaim.ui
 
 ## License
 
-Copyright © 2017 FIXME
+Copyright © 2017 Robert Scherf
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
