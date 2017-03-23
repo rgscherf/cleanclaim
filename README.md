@@ -8,7 +8,7 @@ Using cleanclaim, you can turn MDRA claim forms into flat Excel workbooks that c
 
 Cleanclaim's public API is two functions: `read-book/read-book` and `write-book/write-book`. Use them thusly:
 
-```
+```clojure
 (require '[cleanclaim.read-book :as rb]
          '[cleanclaim.write-book :as wb])
 
