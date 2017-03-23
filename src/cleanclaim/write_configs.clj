@@ -41,6 +41,13 @@
     1
     2))
 
+(defn- employee-type->int
+  [emp-type]
+  (cond
+    (= emp-type "R") 1
+    (= emp-type "TE") 2
+    (= emp-type "BF") 3))
+
 
 ;;;;;;;;;;;;;;;;
 ;; WRITE CONFIGS
@@ -54,14 +61,14 @@
 
   {"Admin Info"
    {:header-row
-    ["ClaimantID" "Claimant" "ThreePercentOPT" "EventType" "TreasurerName" "TreasurerEmail" "TreasurerPhone" "SecondaryName" "SecondaryTitle" "SecondaryEmail" "SecondaryPhone" "MailingAddress" "MailingMunicipality" "MailingPostal" "DateSubmitted"]
+    ["ClaimantID" "Claimant" "ThreePercentOPT" "EventType" "TreasurerName" "TreasurerEmail" "TreasurerPhone" "SecondaryName" "SecondaryTitle" "SecondaryEmail" "SecondaryPhone" "MailingAddress" "MailingMunicipality" "MailingPostal" "DateSubmitted" "Status"]
     :read-table-total
     (constantly 0)
     :write-table-total
     (constantly 0)
     :extract-row
     (fn [claimant-id {:keys [claimant event-type treas-name treas-email treas-phone second-name second-title second-email second-phone street city postal submitted]}]
-      [claimant-id claimant 0 event-type treas-name treas-email treas-phone second-name second-title second-email second-phone street city postal submitted])}
+      [claimant-id claimant 0 event-type treas-name treas-email treas-phone second-name second-title second-email second-phone street city postal submitted 2])}
 
   ;;;;;;;;;;;
   ;; EMPLOYEE
@@ -78,7 +85,7 @@
     :extract-row
     (fn [claimant-id
          {:keys [expense-class name etype start end function ot-hours ot-hourly ot-total te-total benefits reference total]}]
-      [1 claimant-id (expense-class->int expense-class) name start end function ot-hours ot-hourly ot-total te-total benefits reference total total etype])}
+      [3 claimant-id (expense-class->int expense-class) name start end function ot-hours ot-hourly ot-total te-total benefits reference total total (employee-type->int etype)])}
 
 
    ;;;;;;;;;;;;;;;;;;;;;
@@ -95,7 +102,7 @@
     :extract-row
     (fn [claimant-id
          {:keys [expense-class start end supplier description eligible-excluding unrecoverable unrecoverable-manual total reference]}]
-      [1 claimant-id (expense-class->int expense-class) start end supplier description eligible-excluding unrecoverable unrecoverable-manual total total reference])}
+      [3 claimant-id (expense-class->int expense-class) start end supplier description eligible-excluding unrecoverable unrecoverable-manual total total reference])}
 
 
    ;;;;;;;;;;;;
@@ -112,7 +119,7 @@
     :extract-row
     (fn [claimant-id
          {:keys [start end equipment classifier make-model hours rate total reference grand-total expense-class]}]
-      [1 claimant-id (expense-class->int expense-class) start end equipment classifier make-model hours rate total reference grand-total grand-total])}
+      [3 claimant-id (expense-class->int expense-class) start end equipment classifier make-model hours rate total reference grand-total grand-total])}
 
 
    ;;;;;;;;;;
@@ -147,5 +154,5 @@
     :extract-row
     (fn [claimant-id
          {:keys [supplier description documentation reference total] }]
-      [1 claimant-id supplier description documentation reference total])}})
+      [3 claimant-id supplier description documentation reference total])}})
 
